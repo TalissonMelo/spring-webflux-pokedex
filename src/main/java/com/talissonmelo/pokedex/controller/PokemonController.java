@@ -1,8 +1,12 @@
 package com.talissonmelo.pokedex.controller;
 
+import java.time.Duration;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,11 +18,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.talissonmelo.pokedex.model.Pokemon;
+import com.talissonmelo.pokedex.model.PokemonEvent;
 import com.talissonmelo.pokedex.repository.PokemonRepository;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(value = "/pokemons")
 public class PokemonController {
@@ -71,4 +77,12 @@ public class PokemonController {
 	public Mono<Void> deleteAllPokemons() {
 		return pokemonRepository.deleteAll();
 	}
+	
+	@GetMapping(value = "/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<PokemonEvent> findPokemonEvents() {
+        return Flux.interval(Duration.ofSeconds(5))
+                .map(val ->
+                        new PokemonEvent(val, "Pokedex and Pokemon Event")
+                );
+    }
 }
